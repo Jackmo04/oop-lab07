@@ -9,11 +9,31 @@ import it.unibo.inner.api.Predicate;
 public class IterableWithPolicyImpl<T> implements IterableWithPolicy<T> {
 
     private T array[];
+    private Predicate<T> filter;
 
+    /**
+     * If no {@link Predicate} is specified, no filter will be applied
+     * @param array The array to be iterated
+     */
     public IterableWithPolicyImpl(T[] array) {
-        // Defensive copy
-        this.array = Arrays.copyOf(array, array.length);
+        this(array, new Predicate<T>() {
+            @Override
+            public boolean test(T elem) {
+                return true;
+            }
+        });
     }
+
+    /**
+     * Array to iterate with a filter specified by a {@link Predicate}
+     * @param array The array to be iterated
+     * @param filter The filter to apply
+     */
+    public IterableWithPolicyImpl(T[] array, Predicate<T> filter) {
+        this.array = Arrays.copyOf(array, array.length); // Defensive copy
+        this.filter = filter;
+    }
+
 
     @Override
     public Iterator<T> iterator() {
@@ -22,8 +42,7 @@ public class IterableWithPolicyImpl<T> implements IterableWithPolicy<T> {
 
     @Override
     public void setIterationPolicy(Predicate<T> filter) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setIterationPolicy'");
+        this.filter = filter;
     }
 
     private class IterableWithPolicyImplIterator implements Iterator<T>{
@@ -32,6 +51,9 @@ public class IterableWithPolicyImpl<T> implements IterableWithPolicy<T> {
 
         @Override
         public boolean hasNext() {
+            while (index < array.length && !filter.test(array[index])) {
+                index++;
+            }
             return index < array.length;
         }
 
