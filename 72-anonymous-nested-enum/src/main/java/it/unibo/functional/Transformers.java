@@ -54,7 +54,12 @@ public final class Transformers {
      * @param <O> output elements type
      */
     public static <I, O> List<O> transform(final Iterable<I> base, final Function<I, O> transformer) {
-        return null;
+        // TODO Trovare modo di utilizzare flattenTransform
+        final var result = new ArrayList<O>();
+        for (final I input : Objects.requireNonNull(base, "The base iterable cannot be null")) {
+            result.add(transformer.call(input));
+        }
+        return result;
     }
 
     /**
